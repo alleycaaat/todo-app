@@ -1,25 +1,69 @@
-import logo from './logo.svg';
-import './App.css';
+import NotesList from './components/NotesList';
+import { useState, useEffect } from 'react';
+import { nanoid } from 'nanoid';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => {
+    const [notes, setNotes] = useState([
+        {
+            id: nanoid(),
+            text: 'Placeholder text 1',
+            date: 'insert date here',
+        },
+        {
+            id: nanoid(),
+            text: 'Placeholder text 2',
+            date: 'insert date here',
+        },
+        {
+            id: nanoid(),
+            text: 'Placeholder text 3',
+            date: 'insert date here',
+        },
+    ]);
+
+    //retrieves notes from local storage upon start-up
+    useEffect(() => {
+        const saved = JSON.parse(
+            window.localStorage.getItem('react-app-notes-data')
+        );
+        console.log(saved);
+        if (saved) {
+            setNotes(saved);
+        }
+    }, []);
+
+    //saves notes to local storage
+    useEffect(() => {
+        window.localStorage.setItem(
+            'react-app-notes-data',
+            JSON.stringify(notes)
+        );
+    }, [notes]); //causes hook to run on change versus just onload
+
+    const addNote = (text) => {
+        const date = new Date();
+        const newNote = {
+            id: nanoid(),
+            text: text,
+            date: date.toLocaleDateString(),
+        };
+        const newEntry = [...notes, newNote];
+        setNotes(newEntry);
+    };
+    
+    const deleteNote = (id) => {
+        const newNotes = notes.filter((note) => note.id !== id);
+        setNotes(newNotes);
+    };
+    return (
+        <div className='container'>
+            <NotesList
+                notes={notes}
+                handleAdd={addNote}
+                deleteNote={deleteNote}
+            />
+        </div>
+    );
+};
 
 export default App;
