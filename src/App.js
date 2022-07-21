@@ -1,69 +1,93 @@
 import NotesList from './components/NotesList';
 import { useState, useEffect } from 'react';
-import { nanoid } from 'nanoid';
+import api from './api';
+import Loading from './components/loading';
 
 const App = () => {
-    const [notes, setNotes] = useState([
-        {
-            id: nanoid(),
-            text: 'Placeholder text 1',
-            date: 'insert date here',
-        },
-        {
-            id: nanoid(),
-            text: 'Placeholder text 2',
-            date: 'insert date here',
-        },
-        {
-            id: nanoid(),
-            text: 'Placeholder text 3',
-            date: 'insert date here',
-        },
-    ]);
+    const [notes, setNotes] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    //retrieves notes from local storage upon start-up
+    const startUp = () => {
+        api.readall().then((notes) => {
+            let newNotes = [];
+            //map over the data retrieved from the api call
+            notes.map((note) => {
+                //get the id from the db
+                const key = getnoteId(note);
+                newNotes.push({
+                    //keep original formatting when pushing
+                    data: {
+                        note: note.data.note,
+                        date: note.data.date,
+                        id: key,
+                    },
+                });
+                return newNotes;
+            });
+            setNotes(newNotes);
+            setLoading(false);
+        });
+    };
+
     useEffect(() => {
-        const saved = JSON.parse(
-            window.localStorage.getItem('react-app-notes-data')
-        );
-        console.log(saved);
-        if (saved) {
-            setNotes(saved);
-        }
+        startUp();
     }, []);
 
-    //saves notes to local storage
-    useEffect(() => {
-        window.localStorage.setItem(
-            'react-app-notes-data',
-            JSON.stringify(notes)
-        );
-    }, [notes]); //causes hook to run on change versus just onload
+    const addNote = async (newNote) => {
+      //create copy of original
+        const original = [notes];
 
-    const addNote = (text) => {
-        const date = new Date();
-        const newNote = {
-            id: nanoid(),
-            text: text,
-            date: date.toLocaleDateString(),
-        };
-        const newEntry = [...notes, newNote];
-        setNotes(newEntry);
+        await api
+            .create(newNote)
+            .then((response) => {
+                console.log(response);
+                //call startUp so the new note gets an ID, change loading to false
+                startUp();
+            })
+            .catch((err) => {
+                console.log('API error ', err);
+                //if error, revert back to original
+                setNotes(original);
+            });
     };
-    
-    const deleteNote = (id) => {
-        const newNotes = notes.filter((note) => note.id !== id);
-        setNotes(newNotes);
+
+    const deleteNote = async (id) => {
+        const original = [...notes];
+        //const newNotes = notes.filter((note) => note.id !== id);
+        //setNotes(newNotes);
+
+        await api
+            .erase(id)
+            .then((response) => {
+              console.log(response)
+              startUp()
+            })
+            .catch((err) => {
+                console.log('API whoopsie ', err);
+                setNotes(original);
+            });
     };
     return (
         <div className='container'>
+            {loading && <Loading />}
             <NotesList
+                setLoading={setLoading}
                 notes={notes}
-                handleAdd={addNote}
+                addNote={addNote}
                 deleteNote={deleteNote}
             />
         </div>
     );
 };
+
+function getnoteId(note) {
+    //if note doesn't have a ref
+    if (note.ref === undefined) {
+        console.log('ID not retrieved');
+        return null;
+    }
+    //otherwise, return the id
+    return note.ref['@ref'].id;
+}
 
 export default App;

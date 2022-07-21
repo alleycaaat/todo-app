@@ -1,22 +1,23 @@
 import Note from './Note';
 import AddNote from './AddNote';
 
-const NotesList = ({ notes, handleAdd, deleteNote }) => {
-    return (
+const NotesList = ({ notes, addNote, deleteNote, setLoading }) => (
+    
         <div className='wrapper'>
             <div className='notes-list'>
-                {notes.map((note) => (
-                    <Note
-                        id={note.id}
-                        text={note.text}
-                        date={note.date}
-                        deleteNote={deleteNote}
-                    />
+                {notes.map((note, i) => (
+                    <div className='note' key={i}>
+                        <Note
+                            id={note.data.id}
+                            text={note.data.note}
+                            date={note.data.date}
+                            deleteNote={deleteNote}
+                        />
+                    </div>
                 ))}
             </div>
-            <AddNote addNote={handleAdd} />
+            <AddNote addNote={addNote} setLoading={setLoading} />
         </div>
-    );
-};
+        )
 
 export default NotesList;

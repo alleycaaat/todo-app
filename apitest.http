@@ -1,0 +1,18 @@
+###
+get http://localhost:8888/.netlify/functions/readall
+
+###
+post http://localhost:8888/.netlify/functions/create
+Content-Type:  application/json
+
+{
+    "note": "testinsdgsdg new?",
+    "date": "7/20/2022"
+
+}
+
+###
+post http://localhost:8888/.netlify/functions/readall
+
+####
+delete http://localhost:8888/.netlify/functions/erase

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const AddNote = ({ addNote }) => {
+const AddNote = ({ addNote, setLoading }) => {
     const [noteText, setNoteText] = useState('');
     const count = 200;
 
@@ -11,10 +11,17 @@ const AddNote = ({ addNote }) => {
             setNoteText(value);
         }
     };
-    const handleSubmit = () => {
-        //verify the note isn't empty or just whitespace
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        //verify the note isn't empty or just whitespace, then do the things
+        setLoading(true)
         if (noteText.trim().length > 0) {
-            addNote(noteText);
+            let date = new Date()
+            let note={
+                note: noteText,
+                date: date.toLocaleDateString()
+            }
+            addNote(note);
             setNoteText('');
         }
     };
