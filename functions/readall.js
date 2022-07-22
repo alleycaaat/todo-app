@@ -34,35 +34,3 @@ exports.handler = (event, context) => {
             };
         });
 };
-/*
-.then((response) => {
-            //console.log(response.data.Ref.id)
-            const notesRefs = response.data;
-
-            const allDataQuery = notesRefs.map((ref) => {
-                return q.Get(ref);
-            });
-            // then query the refs
-            return client.query(allDataQuery).then((ret) => {
-                return callback(null, {
-                    statusCode: 200,
-                    body: JSON.stringify(ret),
-                });
-            });
-        })
-
-   let deleteNote;
-            if (ref) {
-                //make sure create api has run before displaying
-                deleteNote = (
-                    <MdDeleteForever
-                        onClick={() => deleteNote(id)}
-                        className='delete-icon'
-                        size='1.3em'
-                    />
-                );
-            }
-
-
-
-        */

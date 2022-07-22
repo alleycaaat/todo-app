@@ -24,6 +24,7 @@ const App = () => {
                 });
                 return newNotes;
             });
+            console.log(newNotes)
             setNotes(newNotes);
             setLoading(false);
         });
